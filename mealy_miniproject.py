@@ -6,6 +6,15 @@ Created on Tue Oct 26 13:31:33 2021
 """
 
 
+# insert a input sequence of on and off switches.
+ 
+# Mealy 2.2 transforms the input sequence into a faultless sequence
+
+# Mealy 2.3 takes the output of Mealy 2.2 as input and produces the gate commands as output
+
+test_list = ['on2', 'on3', 'off1', 'off1', 'off1', 'on3', 'off3']
+
+
 class Mealy(object):
     """Mealy Machine : Finite Automata with Output """
 
@@ -67,23 +76,20 @@ def string_to_list(string):
 
 ###########################################################################################
 
-# insert a sequence of on and off switches 
-test_list = ['on2', 'on3', 'off3', 'off2', 'on3', 'off1', 'on1', 'on2', 'off3', 'off3']
-
 Q_22 = ['S01', 'S12', 'S23', 'S3>']
 input_alphabet_22 = ['on1', 'on2', 'on3', 'off1', 'off2', 'off3']
 output_alphabet_22 = ['on1', 'on2', 'on3', 'off1', 'off2', 'off3', 'E']
 
 transitions_22 = {'S01': {'on1': ['S12', 'on1'], 
-                'on2': ['S01', 'E'],
-                'on3': ['S01', 'E'],
+                'on2': ['S23', ['on1', 'on2']],
+                'on3': ['S3>', ['on1', 'on2', 'on3']],
                 'off1': ['S01', 'E'],
                 'off2': ['S01', 'E'],
                 'off3': ['S01', 'E']},
             'S12':
                 {'on1': ['S12', 'E'], 
                 'on2': ['S23', 'on2'],
-                'on3': ['S12', 'E'],
+                'on3': ['S3>', ['on2', 'on3']],
                 'off1': ['S01', 'off1'],
                 'off2': ['S12', 'E'],
                 'off3': ['S12', 'E']},
@@ -91,15 +97,15 @@ transitions_22 = {'S01': {'on1': ['S12', 'on1'],
                 {'on1': ['S23', 'E'], 
                 'on2': ['S23', 'E'],
                 'on3': ['S3>', 'on3'],
-                'off1': ['S23', 'E'],
+                'off1': ['S01', ['off2', 'off3']],
                 'off2': ['S12', 'off2'],
                 'off3': ['S23', 'E']},
             'S3>':
                 {'on1': ['S3>', 'E'], 
                 'on2': ['S3>', 'E'],
                 'on3': ['S3>', 'E'],
-                'off1': ['S3>', 'E'],
-                'off2': ['S3>', 'E'],
+                'off1': ['S01', ['off3', 'off2', 'off1']],
+                'off2': ['S21', ['off3', 'off2']],
                 'off3': ['S23', 'off3']}
                 }
  
@@ -111,33 +117,35 @@ print('The transformed sequence Mealy 2.2: ')
 print(Mealy_22.get_output_from_string_or_list(test_list)[0])
 print('final state: ', Mealy_22.get_output_from_string_or_list(test_list)[1])
 
-##########################################################################################
-
 # converts output of Mealy 2.2 into input of Mealy 2.3 
 input_23 = string_to_list(Mealy_22.get_output_from_string_or_list(test_list)[0])
 
 Q_23 = ['S01', 'S12', 'S23', 'S3>']
-input_alphabet_23 = ['on1', 'on2', 'on3', 'off1', 'off2', 'off3', 'E']
-output_alphabet_23 = ['w1o', 'w3o', 'w1s', 'w3s', 'E']
+input_alphabet_23 = ['on1', 'on2', 'on3', 'off1', 'off2', 'off3', 'on4', 'E']
+output_alphabet_23 = ['w1o', 'w3o', 'w1s', 'w3s', 'w2s', 'E']
 
 transitions_23 = {'S01':
                   
                   {'on1': ['S12', ['w1o', 'w3s']], 
-                'E': ['S01', 'E']},
+                'E': ['S01', 'E'],
+                'on4': ['S01', 'w2s']},
                   
             'S12':
                 {'on2': ['S23', ['w1s', 'w3o']], 
                 'off1': ['S01', ['w1o', 'w3o']],
+                'on4': ['S12', 'w2s'],
                 'E': ['S12', 'E']},
                 
             'S23':
                 {'on3': ['S3>', ['w3s', 'w1s']], 
                 'off2': ['S12', ['w1o', 'w3s']],
+                'on4': ['S23', 'w2s'],
                 'E': ['S23', 'E']},
  
             'S3>':
                 {'off3': ['S23', ['w3o', 'w1s']], 
-                'E': ['S3>', 'E']}
+                'E': ['S3>', 'E'],
+                'on4': ['S3>', 'w2s']}
                 }
     
 initial_state_23 = 'S12'
